@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gas_station_merchant/models/wallet_model.dart';
+import 'package:gas_station_merchant/views/utilities/loader.dart';
+import 'package:gas_station_merchant/views/utilities/urls.dart';
 import 'package:gas_station_merchant/views/utilities/utilities.dart';
-import 'package:page_transition/page_transition.dart';
+
+// apis
+import 'dart:async';
+import 'dart:convert' as convert;
+import 'package:pretty_http_logger/pretty_http_logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// apis
+
 class Transaction extends StatefulWidget {
   const Transaction({Key? key}) : super(key: key);
 
@@ -10,39 +20,168 @@ class Transaction extends StatefulWidget {
 }
 
 class _TransactionState extends State<Transaction> {
-  TextEditingController amountController = TextEditingController();
-  List<Transactions> transactionlist = [
-    Transactions(name: 'Quick Stop Station',image: 'assets/icons/credit.svg',type: 'credit',money: '21200'),
-    Transactions(name: 'Topup',image: 'assets/icons/debit.svg',type: 'debit',money: '20000'),
-    Transactions(name: 'Quick Stop Station',image: 'assets/icons/credit.svg',type: 'credit',money: '21200'),
-    Transactions(name: 'Topup',image: 'assets/icons/debit.svg',type: 'debit',money: '20000'),
-    Transactions(name: 'Quick Stop Station',image: 'assets/icons/credit.svg',type: 'credit',money: '21200'),
-    Transactions(name: 'Topup',image: 'assets/icons/debit.svg',type: 'debit',money: '20000'),
-    Transactions(name: 'Topup',image: 'assets/icons/credit.svg',type: 'credit',money: '21200'),
-    Transactions(name: 'Quick Stop Station',image: 'assets/icons/debit.svg',type: 'debit',money: '20000'),
-  ];
-
+  late String authToken;
+  late String userId;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.delayed(Duration.zero,(){
+      allProcess();
+    });
+  }
+  Future<void> allProcess() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      authToken = prefs.getString('authToken')!;
+      userId = prefs.getString('userId')!;
+      print('my auth token is >>>>> {$authToken}');
+      print('my user id is >>>>> {$userId}');
+    });
+    // categoriesApi(context);
+    walletApi(context, "");
+  }
+  List<TransactionsWalletList>? transactionList = [];
+  String selected = '';
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      top: true,
       child: Scaffold(
         backgroundColor: const Color(0xFFEEE7F6),
         appBar: AppBar(
-          automaticallyImplyLeading: false,
           centerTitle: true,
           backgroundColor: AppColors.primary,
-          title: const Text('Transaction',style: TextStyle(fontSize: 18.0,)),
+          leading: InkWell(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(
+              padding: const EdgeInsets.only(top: 15.0,bottom: 15.0),
+              child: SvgPicture.asset('assets/icons/left.svg',color: Colors.white,),
+            ),
+          ),
+          title: const Text('Transaction History',style: TextStyle(fontSize: 18.0,)),
+          actions: [
+            InkWell(
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   PageTransition(
+                //     type: PageTransitionType.rightToLeftWithFade,
+                //     alignment: Alignment.topCenter,
+                //     duration: const Duration(milliseconds: 1000),
+                //     isIos: true,
+                //     child: const NotificationScreen(),
+                //   ),
+                // );
+              },
+              child: Row(
+                children: [
+                  const SizedBox(width: 16.0),
+                  PopupMenuButton(
+                    elevation: 0.0,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5.0))
+                    ),
+                    icon: SvgPicture.asset('assets/icons/funnel.svg',color: Colors.white),
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem<String>(
+                          value: 'All',
+                          child: InkWell(
+                            onTap: (){
+                              selected = "Daily";
+                              Navigator.pop(context);
+                              walletApi(context, "Daily");
+                              setState(() {});
+                            },
+                            child: Row(
+                              children: [
+                                selected == 'Daily' ?
+                                SvgPicture.asset('assets/icons/selected_circle.svg') :
+                                SvgPicture.asset('assets/icons/unselected_circle.svg'),
+                                const SizedBox(width: 5.0),
+                                const Text('Daily'),
+                              ],
+                            ),
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'All',
+                          child: InkWell(
+                            onTap: (){
+                              selected = "Monthly";
+                              Navigator.pop(context);
+                              walletApi(context, "Monthly");
+                              setState(() {});
+                            },
+                            child: Row(
+                              children: [
+                                selected == 'Monthly' ?
+                                SvgPicture.asset('assets/icons/selected_circle.svg') :
+                                SvgPicture.asset('assets/icons/unselected_circle.svg'),
+                                const SizedBox(width: 5.0),
+                                const Text('Monthly'),
+                              ],
+                            ),
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'All',
+                          child: InkWell(
+                            onTap: (){
+                              selected = "Quarterly";
+                              Navigator.pop(context);
+                              walletApi(context, "Quarterly");
+                              setState(() {});
+                            },
+                            child: Row(
+                              children: [
+                                selected == 'Quarterly' ?
+                                SvgPicture.asset('assets/icons/selected_circle.svg') :
+                                SvgPicture.asset('assets/icons/unselected_circle.svg'),
+                                const SizedBox(width: 5.0),
+                                const Text('Quarterly'),
+                              ],
+                            ),
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'All',
+                          child: InkWell(
+                            onTap: (){
+                              selected = "Yearly";
+                              Navigator.pop(context);
+                              walletApi(context, "Yearly");
+                              setState(() {});
+                            },
+                            child: Row(
+                              children: [
+                                selected == 'Yearly' ?
+                                SvgPicture.asset('assets/icons/selected_circle.svg') :
+                                SvgPicture.asset('assets/icons/unselected_circle.svg'),
+                                const SizedBox(width: 5.0),
+                                const Text('Yearly'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ];
+                    },
+                  ),
+                  const SizedBox(width: 16.0),
+                ],
+              ),
+            ),
+          ],
           elevation: 0.0,
         ),
-        body: SingleChildScrollView(
+        body: transactionList!.isEmpty ? const Center(child: Text("Data not found"),) : SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 10.0),
           child: Column(
             children: [
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: transactionlist.length,
+                itemCount: transactionList!.length,
                 itemBuilder: (BuildContext context, int index) {
                   return InkWell(
                     onTap: () {
@@ -65,11 +204,6 @@ class _TransactionState extends State<Transaction> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14.0),
                         color: Colors.white,
-                        // border: Border.all(
-                        //   width: 1.0,
-                        //   color: AppColors.border,
-                        //   style: BorderStyle.solid,
-                        // ),
                         boxShadow: const [
                           BoxShadow(
                             color: Color(0xFFe6e6e6),
@@ -85,7 +219,7 @@ class _TransactionState extends State<Transaction> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          SvgPicture.asset(transactionlist[index].image.toString(),width: 50.0,),
+                          SvgPicture.asset(transactionList![index].type == "Debit" ? "assets/icons/debit.svg" : "assets/icons/credit.svg",width: 50.0,),
                           const SizedBox(width: 10.0),
                           Expanded(
                             flex: 1,
@@ -93,7 +227,7 @@ class _TransactionState extends State<Transaction> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  transactionlist[index].name.toString(),
+                                  transactionList![index].title.toString(),
                                   style: const TextStyle(
                                       fontSize: 16.0,
                                       color: AppColors.black,
@@ -102,12 +236,12 @@ class _TransactionState extends State<Transaction> {
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                 ),
-                                const Text(
-                                  "15 oct 2022",
+                                Text(
+                                  "${Utilities().DatefomatToDate(transactionList![index].createdAt!)} ${Utilities().DatefomatToMonth(transactionList![index].createdAt!)} ${Utilities().DatefomatToYear(transactionList![index].createdAt!)}",
                                   style: TextStyle(color: AppColors.secondary,fontSize: 12.0),
                                 ),
-                                const Text(
-                                  "ID : 001625498",
+                                Text(
+                                  "ID : ${transactionList![index].id}",
                                   style: TextStyle(color: AppColors.secondary,fontSize: 12.0),
                                 ),
                               ],
@@ -115,9 +249,9 @@ class _TransactionState extends State<Transaction> {
                           ),
                           const SizedBox(width: 10.0),
                           Text(
-                            transactionlist[index].type == 'debit' ? '- \$${transactionlist[index].money.toString()}' : '+  \$${transactionlist[index].money.toString()}',
+                            transactionList![index].amount!,
                             style: TextStyle(
-                                color: transactionlist[index].type == 'debit' ? AppColors.green : AppColors.red,
+                              color: transactionList![index].type == 'Debit' ? AppColors.red : AppColors.green,
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w600,
                             ),
@@ -144,11 +278,34 @@ class _TransactionState extends State<Transaction> {
       border: InputBorder.none,
     );
   }
-}
-class Transactions{
-  String? name;
-  String? image;
-  String? money;
-  String? type;
-  Transactions({required this.name,required this.image,required this.money,required this.type});
+  // walletApi api
+  Future<void> walletApi(BuildContext context, String filter) async {
+    Loader.progressLoadingDialog(context, true);
+    HttpWithMiddleware http = HttpWithMiddleware.build(middlewares: [
+      HttpLogger(logLevel: LogLevel.BODY),
+    ]);
+    var request = {};
+    request['filter'] = filter;
+    var response = await http.post(Uri.parse(Urls.myWallet),
+        body: convert.jsonEncode(request),
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "X-AUTHTOKEN" : authToken,
+          "X-USERID" : userId,
+        });
+    Map<String, dynamic> jsonResponse = convert.jsonDecode(response.body);
+    Loader.progressLoadingDialog(context, false);
+    WalletModel res = await WalletModel.fromJson(jsonResponse);
+    if (res.status == true) {
+      transactionList!.clear();
+      transactionList = res.data!.transactionHistory!.list;
+      setState(() {});
+    } else {
+      Utilities().toast(res.message.toString());
+      setState(() {});
+    }
+    return;
+  }
+  // walletApi api
 }
