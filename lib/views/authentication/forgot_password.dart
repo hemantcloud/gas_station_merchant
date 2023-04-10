@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:gas_station_merchant/views/authentication/otp.dart';
+import 'package:gas_station_merchant/views/authentication/phone_or_mail.dart';
 import 'package:gas_station_merchant/views/utilities/utilities.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -14,7 +14,7 @@ class ForgotPassword extends StatefulWidget {
 class _ForgotPasswordState extends State<ForgotPassword> {
   String phone = '9685326984';
   String mail = 'hemantcloudwapp@gmail.com';
-  String select = 'phone';
+  String select = '';
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -117,7 +117,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       const SizedBox(width: 10.0),
                       Expanded(
                         child: Text(
-                          '****${mail.substring(mail.length - 15)}',
+                          '****${mail.substring(mail.length - 10)}',
                           style: const TextStyle(color: AppColors.black,fontSize: 16.0),
                         ),
                       )
@@ -127,16 +127,20 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    PageTransition(
-                      type: PageTransitionType.rightToLeftWithFade,
-                      alignment: Alignment.topCenter,
-                      duration: const Duration(milliseconds: 1000),
-                      isIos: true,
-                      child: const Otp(),
-                    ),
-                  );
+                  if(select.isEmpty){
+                    Utilities().toast('Please Select something');
+                  }else {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                        type: PageTransitionType.rightToLeftWithFade,
+                        alignment: Alignment.topCenter,
+                        duration: const Duration(milliseconds: 1000),
+                        isIos: true,
+                        child: PhoneOrMail(type: select),
+                      ),
+                    );
+                  }
                 },
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
@@ -149,7 +153,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     borderRadius: BorderRadius.all(Radius.circular(19.0)),
                   ),
                   child: const Text(
-                    'Send OTP',
+                    'Submit',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,

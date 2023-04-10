@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "548685969164",
+    "project_id": "gas-station-customer",
+    "storage_bucket": "gas-station-customer.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:548685969164:android:2f2c2c8d2fcbdf68e1bb29",
+        "android_client_info": {
+          "package_name": "com.cw.gas_station_customer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "548685969164-do8ui76ilivjn0alg4b50gabkb5ntbt6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cw.gas_station_customer",
+            "certificate_hash": "076bc04c4c9ebeebb3cd23d30f64f59a4b82d582"
+          }
+        },
+        {
+          "client_id": "548685969164-ijh1c4jdcfmod7iueu3g3p6oqiq7m8cu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDC8yqzoZwlV0-iTRALl9xN9tmXkRji7ok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "548685969164-ijh1c4jdcfmod7iueu3g3p6oqiq7m8cu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:548685969164:android:6633ddd01451e3fde1bb29",
+        "android_client_info": {
+          "package_name": "com.cw.gas_station_merchant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "548685969164-ijh1c4jdcfmod7iueu3g3p6oqiq7m8cu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDC8yqzoZwlV0-iTRALl9xN9tmXkRji7ok"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "548685969164-ijh1c4jdcfmod7iueu3g3p6oqiq7m8cu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
